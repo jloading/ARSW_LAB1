@@ -1,4 +1,8 @@
 package edu.eci.arsw.math;
+import edu.eci.arsw.threads.PiDigitsThread;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 
 ///  <summary>
 ///  An implementation of the Bailey-Borwein-Plouffe formula for calculating hexadecimal
@@ -18,7 +22,7 @@ public class PiDigits {
      * @param count The number of digits to return
      * @return An array containing the hexadecimal digits.
      */
-    public static byte[] getDigits(int start, int count) {
+    public static byte[] getDigits(int start, int count, int N) throws IOException {
         if (start < 0) {
             throw new RuntimeException("Invalid Interval");
         }
@@ -28,20 +32,47 @@ public class PiDigits {
         }
 
         byte[] digits = new byte[count];
-        double sum = 0;
 
-        for (int i = 0; i < count; i++) {
-            if (i % DigitsPerSum == 0) {
-                sum = 4 * sum(1, start)
-                        - 2 * sum(4, start)
-                        - sum(5, start)
-                        - sum(6, start);
+        if (N == 1){
+            double sum = 0;
 
-                start += DigitsPerSum;
+            for (int i = 0; i < count; i++) {
+                if (i % DigitsPerSum == 0) {
+                    sum = 4 * sum(1, start)
+                            - 2 * sum(4, start)
+                            - sum(5, start)
+                            - sum(6, start);
+
+                    start += DigitsPerSum;
+                }
+
+                sum = 16 * (sum - Math.floor(sum));
+                digits[i] = (byte) sum;
             }
+        }
+        else if (N > 1){
+            int div = count / N;
+            System.out.println("DIV" + div);
+            ArrayList<byte[]> results = new ArrayList<>();
+            for (int i = 0; i < N-2; i++){
+                PiDigitsThread pd1 = new PiDigitsThread(div*i, div);
+                pd1.start();
+                results.add(pd1.getDigits());
+            }
+            PiDigitsThread pd2 = new PiDigitsThread(div*(N-1), div + count % N);
+            pd2.start();
+            results.add(pd2.getDigits());
 
-            sum = 16 * (sum - Math.floor(sum));
-            digits[i] = (byte) sum;
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+            byte c[] = outputStream.toByteArray( );
+            for (int i = 0; i < results.size(); i++){
+                outputStream.write(results.get(i));
+            }
+            digits = outputStream.toByteArray();
+            System.out.println("Digits (PiDigits): " + digits);
+        }
+        else if (N < 1) {
+            throw new RuntimeException("Invalid Number of Threads");
         }
 
         return digits;

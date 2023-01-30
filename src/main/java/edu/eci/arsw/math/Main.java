@@ -5,6 +5,7 @@
  */
 package edu.eci.arsw.math;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -14,9 +15,13 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String a[]) {
-        System.out.println(bytesToHex(PiDigits.getDigits(0, 10)));
-        System.out.println(bytesToHex(PiDigits.getDigits(1, 100)));
-        System.out.println(bytesToHex(PiDigits.getDigits(1, 1000000)));
+        try {
+            System.out.println(bytesToHex(PiDigits.getDigits(0, 10, 1)));
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 100, 3)));
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 1000000, 4)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
