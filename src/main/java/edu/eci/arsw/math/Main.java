@@ -17,9 +17,11 @@ public class Main {
     public static void main(String a[]) {
         try {
             System.out.println(bytesToHex(PiDigits.getDigits(0, 10, 1)));
-            System.out.println(bytesToHex(PiDigits.getDigits(1, 100, 3)));
-            System.out.println(bytesToHex(PiDigits.getDigits(1, 1000000, 4)));
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 100, 2)));
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 1000000, 3)));
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

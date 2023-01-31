@@ -8,7 +8,7 @@ public class PiDigitsThread extends Thread{
 
     private int start;
     private int count;
-    byte[] digits = new byte[count];
+    byte[] digits;
 
     public PiDigitsThread(int start, int count){
         this.start = start;
@@ -18,23 +18,22 @@ public class PiDigitsThread extends Thread{
     public void run(){
         try {
             calculateDigits();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println("Threads End -----------------RESULT: "+ getDigits() +"----------------------");
     }
 
 
-    /**
-     * Returns a range of hexadecimal digits of pi.
-     * @param start The starting location of the range.
-     * @param count The number of digits to return
-     * @return An array containing the hexadecimal digits.
-     */
-    public byte[] calculateDigits() throws IOException {
+    public byte[] calculateDigits() throws IOException, InterruptedException {
         PiDigits pd = new PiDigits();
-        digits = pd.getDigits(start, count, 1);
+        setDigits(pd.getDigits(start, count, 1));
         return digits;
 
+    }
+
+    private void setDigits(byte[] digits){
+        this.digits= digits;
     }
 
     public byte[] getDigits() {

@@ -22,7 +22,7 @@ public class PiDigits {
      * @param count The number of digits to return
      * @return An array containing the hexadecimal digits.
      */
-    public static byte[] getDigits(int start, int count, int N) throws IOException {
+    public static byte[] getDigits(int start, int count, int N) throws IOException, InterruptedException {
         if (start < 0) {
             throw new RuntimeException("Invalid Interval");
         }
@@ -52,24 +52,44 @@ public class PiDigits {
         }
         else if (N > 1){
             int div = count / N;
-            System.out.println("DIV" + div);
+            System.out.println("DIV: " + div);
             ArrayList<byte[]> results = new ArrayList<>();
-            for (int i = 0; i < N-2; i++){
-                PiDigitsThread pd1 = new PiDigitsThread(div*i, div);
+            ArrayList<PiDigitsThread> threads = new ArrayList<>();
+
+            for (int i = 0; i < N-1; i++){
+                PiDigitsThread pd1 = new PiDigitsThread(div*i + start, div);
+                System.out.println("Start: " + (div*i + start) + " Count: " + div);
+                threads.add(pd1);
                 pd1.start();
-                results.add(pd1.getDigits());
             }
-            PiDigitsThread pd2 = new PiDigitsThread(div*(N-1), div + count % N);
+
+            PiDigitsThread pd2 = new PiDigitsThread(div*(N-1) + start , (div + count % N));
+            System.out.println("Start: " + (div*(N-1) + start) + " Count: " + (div + count % N));
+            System.out.println("MOD: "+ count % N);
+            threads.add(pd2);
             pd2.start();
+
+            for (int i = 0; i < threads.size(); i++){
+                threads.get(threads.size()-i-1).join();
+            }
+
+            for (int i = 0; i < threads.size() - 1; i++) {
+                results.add(threads.get(i).getDigits());
+            }
             results.add(pd2.getDigits());
 
+            System.out.println(threads);
+            System.out.println(results);
+
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-            byte c[] = outputStream.toByteArray( );
+
             for (int i = 0; i < results.size(); i++){
                 outputStream.write(results.get(i));
             }
+
             digits = outputStream.toByteArray();
             System.out.println("Digits (PiDigits): " + digits);
+
         }
         else if (N < 1) {
             throw new RuntimeException("Invalid Number of Threads");
