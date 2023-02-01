@@ -6,7 +6,6 @@
 package edu.eci.arsw.math;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  *
@@ -16,9 +15,27 @@ public class Main {
 
     public static void main(String a[]) {
         try {
-            System.out.println(bytesToHex(PiDigits.getDigits(0, 10, 1)));
-            System.out.println(bytesToHex(PiDigits.getDigits(1, 100, 2)));
-            System.out.println(bytesToHex(PiDigits.getDigits(1, 1000000, 3)));
+            // System.out.println(bytesToHex(PiDigits.getDigits(0, 100000, 1)));
+            long startTime = System.currentTimeMillis();
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 100000, 4)));
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            System.out.println("Execution time (milliseconds): " + executionTime);
+            startTime = System.currentTimeMillis();
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 100000, 8)));
+            endTime = System.currentTimeMillis();
+            executionTime = endTime - startTime;
+            System.out.println("Execution time (milliseconds): " + executionTime);
+            startTime = System.currentTimeMillis();
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 100000, 200)));
+            endTime = System.currentTimeMillis();
+            executionTime = endTime - startTime;
+            System.out.println("Execution time (milliseconds): " + executionTime);
+            startTime = System.currentTimeMillis();
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 100000, 500)));
+            endTime = System.currentTimeMillis();
+            executionTime = endTime - startTime;
+            System.out.println("Execution time (milliseconds): " + executionTime);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -35,10 +52,10 @@ public class Main {
             hexChars[j * 2] = hexArray[v >>> 4];
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
-        StringBuilder sb=new StringBuilder();
-        for (int i=0;i<hexChars.length;i=i+2){
-            //sb.append(hexChars[i]);
-            sb.append(hexChars[i+1]);            
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < hexChars.length; i = i + 2) {
+            // sb.append(hexChars[i]);
+            sb.append(hexChars[i + 1]);
         }
         return sb.toString();
     }

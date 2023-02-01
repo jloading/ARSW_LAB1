@@ -1,4 +1,5 @@
 package edu.eci.arsw.math;
+
 import edu.eci.arsw.threads.PiDigitsThread;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,14 +16,15 @@ public class PiDigits {
     private static int DigitsPerSum = 8;
     private static double Epsilon = 1e-17;
 
-    
     /**
      * Returns a range of hexadecimal digits of pi.
+     * 
      * @param start The starting location of the range.
      * @param count The number of digits to return
      * @return An array containing the hexadecimal digits.
      */
-    public static byte[] getDigits(int start, int count, int N) throws IOException, InterruptedException {
+    public static byte[] getDigits(int start, int count) {
+
         if (start < 0) {
             throw new RuntimeException("Invalid Interval");
         }
@@ -32,70 +34,58 @@ public class PiDigits {
         }
 
         byte[] digits = new byte[count];
+        double sum = 0;
 
-        if (N == 1){
-            double sum = 0;
+        for (int i = 0; i < count; i++) {
+            if (i % DigitsPerSum == 0) {
+                sum = 4 * sum(1, start)
+                        - 2 * sum(4, start)
+                        - sum(5, start)
+                        - sum(6, start);
 
-            for (int i = 0; i < count; i++) {
-                if (i % DigitsPerSum == 0) {
-                    sum = 4 * sum(1, start)
-                            - 2 * sum(4, start)
-                            - sum(5, start)
-                            - sum(6, start);
-
-                    start += DigitsPerSum;
-                }
-
-                sum = 16 * (sum - Math.floor(sum));
-                digits[i] = (byte) sum;
+                start += DigitsPerSum;
             }
-        }
-        else if (N > 1){
-            int div = count / N;
-            System.out.println("DIV: " + div);
-            ArrayList<byte[]> results = new ArrayList<>();
-            ArrayList<PiDigitsThread> threads = new ArrayList<>();
-
-            for (int i = 0; i < N-1; i++){
-                PiDigitsThread pd1 = new PiDigitsThread(div*i + start, div);
-                System.out.println("Start: " + (div*i + start) + " Count: " + div);
-                threads.add(pd1);
-                pd1.start();
-            }
-
-            PiDigitsThread pd2 = new PiDigitsThread(div*(N-1) + start , (div + count % N));
-            System.out.println("Start: " + (div*(N-1) + start) + " Count: " + (div + count % N));
-            System.out.println("MOD: "+ count % N);
-            threads.add(pd2);
-            pd2.start();
-
-            for (int i = 0; i < threads.size(); i++){
-                threads.get(threads.size()-i-1).join();
-            }
-
-            for (int i = 0; i < threads.size() - 1; i++) {
-                results.add(threads.get(i).getDigits());
-            }
-            results.add(pd2.getDigits());
-
-            System.out.println(threads);
-            System.out.println(results);
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-
-            for (int i = 0; i < results.size(); i++){
-                outputStream.write(results.get(i));
-            }
-
-            digits = outputStream.toByteArray();
-            System.out.println("Digits (PiDigits): " + digits);
-
-        }
-        else if (N < 1) {
-            throw new RuntimeException("Invalid Number of Threads");
+            sum = 16 * (sum - Math.floor(sum));
+            digits[i] = (byte) sum;
         }
 
         return digits;
+    }
+
+    public static byte[] getDigits(int start, int count, int n) throws InterruptedException, IOException {
+        ArrayList<PiDigitsThread> threads = new ArrayList<>();
+        int increment = count / n;
+        int restIncrement = count % n;
+        int finish = increment;
+        // creacion de hilos
+
+        for (int i = 0; i < n; i++) {
+            if (i == n - 1) {
+                increment += restIncrement;
+                finish = increment;
+            }
+            threads.add(new PiDigitsThread(start, finish));
+            start += increment;
+        }
+        // iniciar hilos
+
+        for (PiDigitsThread th : threads) {
+            th.start();
+        }
+
+        // esperar al hijo main
+        for (PiDigitsThread th : threads) {
+            th.join();
+        }
+
+        // resultado
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        for (PiDigitsThread th : threads) {
+            outputStream.write(th.getDigits());
+        }
+        return outputStream.toByteArray();
+
     }
 
     /// <summary>
