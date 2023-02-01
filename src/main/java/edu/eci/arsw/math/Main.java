@@ -15,11 +15,15 @@ public class Main {
 
     public static void main(String a[]) {
         try {
-            // System.out.println(bytesToHex(PiDigits.getDigits(0, 100000, 1)));
             long startTime = System.currentTimeMillis();
-            System.out.println(bytesToHex(PiDigits.getDigits(1, 100000, 4)));
+            System.out.println(bytesToHex(PiDigits.getDigits(0, 100000, 1)));
             long endTime = System.currentTimeMillis();
             long executionTime = endTime - startTime;
+            System.out.println("Execution time (milliseconds): " + executionTime);
+            startTime = System.currentTimeMillis();
+            System.out.println(bytesToHex(PiDigits.getDigits(1, 100000, 4)));
+            endTime = System.currentTimeMillis();
+            executionTime = endTime - startTime;
             System.out.println("Execution time (milliseconds): " + executionTime);
             startTime = System.currentTimeMillis();
             System.out.println(bytesToHex(PiDigits.getDigits(1, 100000, 8)));

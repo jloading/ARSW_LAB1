@@ -1,9 +1,5 @@
 package edu.eci.arsw.threads;
 
-import edu.eci.arsw.math.PiDigits;
-
-import java.io.IOException;
-
 public class PiDigitsThread extends Thread {
 
     private static int DigitsPerSum = 8;
